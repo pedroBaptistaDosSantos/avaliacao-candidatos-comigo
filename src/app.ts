@@ -2,7 +2,7 @@ import express, { Application } from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
 import morgan from 'morgan';
-import ticketRoutes from './routes/ticket';
+import ticketRoutes from './routes/tickets';
 
 const app: Application = express();
 
@@ -12,7 +12,7 @@ app.use(cors());
 app.use(morgan('combined'));
 app.use(express.json());
 
-// Routes
+// Routes - VERIFIQUE ESTA LINHA!
 app.use('/api/tickets', ticketRoutes);
 
 // Health check
@@ -21,7 +21,7 @@ app.get('/health', (req, res) => {
 });
 
 // 404 handler
-app.use('*', (req, res) => {
+app.use((req, res) => {
   res.status(404).json({ message: 'Route not found' });
 });
 
