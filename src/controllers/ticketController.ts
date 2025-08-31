@@ -1,7 +1,9 @@
 import { Request, Response } from 'express';
 import { ticketSchema } from '../types/tickets';
 import { isZodError, formatZodError } from '../utils/zodHelpers';
+import * as ticketService from '../services/ticketService';
 
+// Função validateTicket (validação sem salvar)
 export const validateTicket = (req: Request, res: Response): void => {
   try {
     const validatedData = ticketSchema.parse(req.body);
@@ -25,6 +27,53 @@ export const validateTicket = (req: Request, res: Response): void => {
     }
     
     console.error('Erro interno:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Erro interno do servidor'
+    });
+  }
+};
+
+// Função createTicket (criação com persistência)
+export const createTicket = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const { title, description, priority, category, userId } = req.body;
+    
+    const ticket = await ticketService.createTicket({
+      title,
+      description,
+      priority,
+      category,
+      userId
+    });
+    
+    res.status(201).json({
+      success: true,
+      message: 'Ticket criado com sucesso',
+      data: ticket
+    });
+    
+  } catch (error) {
+    console.error('Erro ao criar ticket:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Erro interno do servidor'
+    });
+  }
+};
+
+// Função getTickets (listagem)
+export const getTickets = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const tickets = await ticketService.getTickets();
+    
+    res.status(200).json({
+      success: true,
+      data: tickets
+    });
+    
+  } catch (error) {
+    console.error('Erro ao buscar tickets:', error);
     res.status(500).json({
       success: false,
       message: 'Erro interno do servidor'
