@@ -27,3 +27,15 @@ export const authenticateToken = (req: AuthRequest, res: Response, next: NextFun
     });
   }
 };
+
+export const requireRole = (role: string) => {
+  return (req: AuthRequest, res: Response, next: NextFunction) => {
+    if (req.user?.role !== role) {
+      return res.status(403).json({
+        success: false,
+        message: 'Acesso não autorizado. Permissão necessária: ' + role
+      });
+    }
+    next();
+  };
+};

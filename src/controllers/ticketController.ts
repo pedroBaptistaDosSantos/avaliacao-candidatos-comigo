@@ -80,3 +80,23 @@ export const getTickets = async (req: Request, res: Response): Promise<void> => 
     });
   }
 };
+
+export const deleteTicket = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const { id } = req.params;
+    
+    await ticketService.deleteTicket(id);
+    
+    res.status(200).json({
+      success: true,
+      message: 'Ticket deletado com sucesso'
+    });
+    
+  } catch (error) {
+    console.error('Erro ao deletar ticket:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Erro interno do servidor'
+    });
+  }
+};
