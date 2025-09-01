@@ -1,131 +1,93 @@
 # Sistema de Gerenciamento de Tickets - Comigotech
 
-Sistema completo para gerenciamento de tickets com API RESTful, autenticação JWT, validação de dados e persistência em PostgreSQL.
+Sistema para gerenciamento de tickets com API RESTful, autenticação JWT e PostgreSQL.
 
-## Tecnologias Utilizadas
-
-- **Backend:** Node.js + Express.js + TypeScript
-- **Validação:** Zod
-- **Autenticação:** JWT + bcrypt
-- **Banco de Dados:** PostgreSQL + Prisma ORM
-- **Testes:** Jest + Supertest
-- **Containerização:** Docker + Docker Compose
+## Tecnologias
+- Node.js + Express + TypeScript
+- Zod para validação
+- JWT + bcrypt para autenticação
+- PostgreSQL + Prisma ORM
+- Docker + Docker Compose
 
 ## Como Executar
 
-### 1. Instalar dependências
+### 1. Clone e prepare o projeto
 ```bash
-npm install
-```
-
-### 2. Configurar ambiente
-```bash
+git clone <url-do-repositorio>
+cd avaliacao-candidatos-comigo
 cp .env.example .env
 ```
-Edite o `.env` com suas configurações.
 
-### 3. Banco de dados com Docker
+### 2. Subir containers
 ```bash
-docker-compose up -d postgres
+docker-compose up -d
 ```
 
-### 4. Configurar Prisma
+### 3. Configurar banco de dados (OBRIGATÓRIO)
 ```bash
-npx prisma generate
-npx prisma db push
+docker-compose exec app npx prisma db push
+docker-compose exec app npx prisma db seed
 ```
 
-### 5. Executar em desenvolvimento
-```bash
-npm run dev
-```
+### 4. Acessar a aplicação
+- API: http://localhost:3000
+- Health Check: GET /health
+- PGAdmin: http://localhost:8080 (opcional)
 
-## Autenticação
+## Usuários de Teste
 
-### Registrar usuário
-```bash
-POST /api/auth/register
-Content-Type: application/json
+Criados automaticamente pelo seed:
 
-{
-  "email": "usuario@comigo.com",
-  "name": "Nome do Usuário",
-  "password": "senha123"
-}
-```
+### Administrador
+- Email: admin@comigotech.com
+- Senha: admin123
+- Permissões: Completas
 
-### Login
-```bash
-POST /api/auth/login
-Content-Type: application/json
+### Atendente
+- Email: atendente@comigotech.com
+- Senha: atendente123
+- Permissões: Criar e listar tickets
 
-{
-  "email": "usuario@comigo.com",
-  "password": "senha123"
-}
-```
-
-## Endpoints da API
+## Endpoints Principais
 
 ### Autenticação
-- `POST /api/auth/register` - Registrar novo usuário  
-- `POST /api/auth/login` - Login e obter token JWT  
-
-### Tickets (Protegidos por JWT)
-- `POST /api/tickets` - Criar novo ticket (Authorization: Bearer <token>)  
-- `GET /api/tickets` - Listar todos tickets (Authorization: Bearer <token>)  
-- `POST /api/tickets/validate` - Validar dados do ticket (Público)  
-
-### Health Check
-- `GET /health` - Status da API  
-
-## Testes
 ```bash
-# Todos os testes
-npm test
+# Registrar usuário
+POST /api/auth/register
+{"email": "user@test.com", "name": "User", "password": "password123"}
 
-# Testes unitários
-npm run test:unit
-
-# Testes de integração
-npm run test:integration
-
-# Testes com cobertura
-npm run test:coverage
+# Login
+POST /api/auth/login
+{"email": "admin@comigotech.com", "password": "admin123"}
 ```
 
-## Docker
+### Tickets
 ```bash
-# Subir todos os serviços
-docker-compose up -d
+# Criar ticket (precisa de token JWT)
+POST /api/tickets
+Authorization: Bearer <token>
+{"title": "Problema", "description": "Descrição", "priority": "HIGH", "category": "Categoria"}
 
-# Subir apenas PostgreSQL
-docker-compose up -d postgres
+# Listar tickets
+GET /api/tickets
+Authorization: Bearer <token>
 
-# Ver logs
-docker-compose logs
+# Validar ticket (público)
+POST /api/tickets/validate
+{"title": "Teste", "description": "Teste", "priority": "HIGH", "category": "Teste"}
 ```
 
-## Status do Projeto
+## Comandos Úteis
+```bash
+# Ver logs da aplicação
+docker-compose logs app
 
-### Concluído
-- API RESTful com Express.js e TypeScript  
-- Validação de dados com Zod  
-- Persistência com PostgreSQL e Prisma  
-- Autenticação JWT com bcrypt  
-- Sistema de usuários e tickets  
-- Testes unitários e de integração  
-- Dockerização com PostgreSQL  
+# Executar testes
+docker-compose exec app npm test
 
-### Em Andamento
-- Sistema de permissões (Admin vs Atendente)  
-- Testes end-to-end  
-- Deploy em nuvem  
+# Acessar banco de dados
+docker-compose exec postgres psql -U postgres -d tickets_db
 
-### Próximos Passos
-- Frontend web React/Vue  
-- Sistema de notificações  
-- Dashboard administrativo  
-- API documentation  
-- CI/CD pipeline  
-
+# Parar serviços
+docker-compose down
+```
