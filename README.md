@@ -1,13 +1,15 @@
-# Sistema de Tickets - Comigotech
+# Sistema de Gerenciamento de Tickets - Comigotech
 
-Sistema para gerenciamento de tickets com API RESTful, validação de dados e testes automatizados.
+Sistema completo para gerenciamento de tickets com API RESTful, autenticação JWT, validação de dados e persistência em PostgreSQL.
 
-## Tecnologias
+## Tecnologias Utilizadas
 
-- Node.js + Express.js + TypeScript
-- Zod para validação
-- Jest para testes
-- PostgreSQL + Prisma (em implementação)
+- **Backend:** Node.js + Express.js + TypeScript
+- **Validação:** Zod
+- **Autenticação:** JWT + bcrypt
+- **Banco de Dados:** PostgreSQL + Prisma ORM
+- **Testes:** Jest + Supertest
+- **Containerização:** Docker + Docker Compose
 
 ## Como Executar
 
@@ -22,58 +24,108 @@ cp .env.example .env
 ```
 Edite o `.env` com suas configurações.
 
-### 3. Executar em desenvolvimento
+### 3. Banco de dados com Docker
+```bash
+docker-compose up -d postgres
+```
+
+### 4. Configurar Prisma
+```bash
+npx prisma generate
+npx prisma db push
+```
+
+### 5. Executar em desenvolvimento
 ```bash
 npm run dev
 ```
 
-## Executar testes
+## Autenticação
+
+### Registrar usuário
 ```bash
-npm test
+POST /api/auth/register
+Content-Type: application/json
+
+{
+  "email": "usuario@comigo.com",
+  "name": "Nome do Usuário",
+  "password": "senha123"
+}
+```
+
+### Login
+```bash
+POST /api/auth/login
+Content-Type: application/json
+
+{
+  "email": "usuario@comigo.com",
+  "password": "senha123"
+}
 ```
 
 ## Endpoints da API
 
-### Validar ticket
-```bash
-POST /api/tickets/validate
-{
-  "title": "Problema com login",
-  "description": "Não consigo acessar",
-  "priority": "HIGH",
-  "category": "Autenticação"
-}
-```
+### Autenticação
+- `POST /api/auth/register` - Registrar novo usuário  
+- `POST /api/auth/login` - Login e obter token JWT  
 
-### Health check
-```bash
-GET /health
-```
+### Tickets (Protegidos por JWT)
+- `POST /api/tickets` - Criar novo ticket (Authorization: Bearer <token>)  
+- `GET /api/tickets` - Listar todos tickets (Authorization: Bearer <token>)  
+- `POST /api/tickets/validate` - Validar dados do ticket (Público)  
+
+### Health Check
+- `GET /health` - Status da API  
 
 ## Testes
 ```bash
 # Todos os testes
 npm test
 
-# Apenas testes unitários
+# Testes unitários
 npm run test:unit
+
+# Testes de integração
+npm run test:integration
 
 # Testes com cobertura
 npm run test:coverage
 ```
 
+## Docker
+```bash
+# Subir todos os serviços
+docker-compose up -d
+
+# Subir apenas PostgreSQL
+docker-compose up -d postgres
+
+# Ver logs
+docker-compose logs
+```
+
 ## Status do Projeto
 
 ### Concluído
-- API com validação de tickets
-- Testes unitários implementados
-- Estrutura do projeto
+- API RESTful com Express.js e TypeScript  
+- Validação de dados com Zod  
+- Persistência com PostgreSQL e Prisma  
+- Autenticação JWT com bcrypt  
+- Sistema de usuários e tickets  
+- Testes unitários e de integração  
+- Dockerização com PostgreSQL  
 
 ### Em Andamento
-- Integração com PostgreSQL
-- Autenticação JWT
+- Sistema de permissões (Admin vs Atendente)  
+- Testes end-to-end  
+- Deploy em nuvem  
 
 ### Próximos Passos
-- Sistema de usuários e permissões
-- Dockerização
-- Deploy em nuvem
+- Frontend web React/Vue  
+- Sistema de notificações  
+- Dashboard administrativo  
+- API documentation  
+- CI/CD pipeline  
+
