@@ -4,8 +4,9 @@ import bcrypt from 'bcryptjs';
 const prisma = new PrismaClient();
 
 async function main() {
-  // Criar usuário padrão se não existir
-  const defaultUser = await prisma.user.upsert({
+  console.log('Iniciando seed do banco de dados...');
+
+  const adminUser = await prisma.user.upsert({
     where: { email: 'admin@comigotech.com' },
     update: {},
     create: {
@@ -16,12 +17,25 @@ async function main() {
     }
   });
 
-  console.log('Usuário padrão criado:', defaultUser);
+  const attendantUser = await prisma.user.upsert({
+    where: { email: 'atendente@comigotech.com' },
+    update: {},
+    create: {
+      email: 'atendente@comigotech.com',
+      name: 'Atendente',
+      password: await bcrypt.hash('atendente123', 10),
+      role: Role.ATTENDANT
+    }
+  });
+
+  console.log(' Usuários criados com sucesso!');
+  console.log(' Admin:', adminUser.email, '- Senha: admin123');
+  console.log(' Atendente:', attendantUser.email, '- Senha: atendente123');
 }
 
 main()
   .catch((e) => {
-    console.error(e);
+    console.error(' Erro no seed:', e);
     process.exit(1);
   })
   .finally(async () => {
